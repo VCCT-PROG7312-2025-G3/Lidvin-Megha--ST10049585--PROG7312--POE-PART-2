@@ -1,0 +1,293 @@
+﻿@model PROG7312_POEPART2.Models.Event
+@{
+    ViewData["Title"] = Model.Title;
+    var similarEvents = ViewBag.SimilarEvents as List<PROG7312_POEPART2.Models.Event>;
+    var recommendedEvents = ViewBag.RecommendedEvents as List<PROG7312_POEPART2.Models.Event>;
+}
+
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Events</a></li>
+            <li class="breadcrumb-item"><a asp-action="Category" asp-route-category="@Model.Category">@Model.Category</a></li>
+            <li class="breadcrumb-item active">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg mb-4">
+                <!-- Event Image -->
+                <div class="event-detail-image bg-gradient-primary text-white d-flex align-items-center justify-content-center"
+                     style="height: 400px;">
+                    <i class="bi bi-calendar-event display-1"></i>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Title and Category -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="display-5 fw-bold mb-0">@Model.Title</h1>
+                        <span class="badge bg-primary fs-6 ms-3">@Model.Category</span>
+                    </div>
+
+                    @if (Model.Priority >= 4)
+                    {
+                        <div class="alert alert-warning border-0 mb-4">
+                            <i class="bi bi-star-fill me-2"></i>
+                            <strong>Featured Event</strong> - This is a high-priority event!
+                        </div>
+                    }
+
+                    <!-- Event Details Grid -->
+                    <div class="row g-3 mb-4 event-info-grid">
+                        <div class="col-md-6">
+                            <div class="info-card p-3 bg-light rounded">
+                                <i class="bi bi-calendar3 text-primary fs-4"></i>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Date</h6>
+                                    <p class="mb-0">@Model.EventDate.ToString("MMMM dd, yyyy")</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card p-3 bg-light rounded">
+                                <i class="bi bi-clock text-success fs-4"></i>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Time</h6>
+                                    <p class="mb-0">@Model.EventDate.ToString("h:mm tt")</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card p-3 bg-light rounded">
+                                <i class="bi bi-geo-alt text-danger fs-4"></i>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Location</h6>
+                                    <p class="mb-0">@Model.Location</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card p-3 bg-light rounded">
+                                <i class="bi bi-people text-info fs-4"></i>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Capacity</h6>
+                                    <p class="mb-0">@Model.Capacity people</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h4 class="mb-3">
+                            <i class="bi bi-file-text me-2"></i>About This Event
+                        </h4>
+                        <p class="lead">@Model.Description</p>
+                    </div>
+
+                    <!-- Organizer -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="bi bi-person-badge me-2"></i>Organizer
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                 style="width: 50px; height: 50px;">
+                                <i class="bi bi-building fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">@Model.Organizer</h6>
+                                <small class="text-muted">Event Organizer</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="bi bi-tags me-2"></i>Tags
+                        </h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <span class="badge bg-secondary fs-6">#@tag</span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-ticket-perforated me-2"></i>Register Now
+                        </button>
+                        <button class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-heart me-2"></i>Add to Favorites
+                        </button>
+                        <button class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-share me-2"></i>Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Events Section (Content-Based Filtering) -->
+            @if (similarEvents != null && similarEvents.Any())
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3">
+                            <i class="bi bi-collection me-2 text-info"></i>
+                            Similar Events You Might Like
+                        </h4>
+                        <div class="row g-3">
+                            @foreach (var evt in similarEvents)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card h-100 border similar-event-card">
+                                        <div class="card-body">
+                                            <span class="badge bg-info mb-2">@evt.Category</span>
+                                            <h6 class="card-title">@evt.Title</h6>
+                                            <p class="card-text small text-muted">
+                                                <i class="bi bi-calendar3 me-1"></i>
+                                                @evt.EventDate.ToString("MMM dd")
+                                            </p>
+                                            <a asp-action="Details" asp-route-id="@evt.Id"
+                                               class="btn btn-sm btn-outline-info stretched-link">
+                                                View Event
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Info Card -->
+            <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 20px;">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Event Quick Info</h5>
+
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Priority Level</span>
+                            <span class="fw-bold">
+                                @for (int i = 0; i < Model.Priority; i++)
+                                {
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                }
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Days Until Event</span>
+                            <span class="fw-bold">@((Model.EventDate - DateTime.Now).Days) days</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Event ID</span>
+                            <span class="fw-bold">#@Model.Id.ToString("D4")</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-success btn-lg mb-2">
+                            <i class="bi bi-calendar-plus me-2"></i>Add to Calendar
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended Events Sidebar -->
+            @if (recommendedEvents != null && recommendedEvents.Any())
+            {
+                <div class="card border-0 shadow-sm bg-light">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-stars text-warning me-2"></i>
+                            Recommended
+                        </h5>
+                        @foreach (var evt in recommendedEvents)
+                        {
+                            <div class="card mb-2 recommendation-mini-card">
+                                <div class="card-body p-3">
+                                    <span class="badge bg-warning text-dark mb-1">@evt.Category</span>
+                                    <h6 class="mb-1">@evt.Title</h6>
+                                    <small class="text-muted d-block mb-2">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        @evt.EventDate.ToString("MMM dd, yyyy")
+                                    </small>
+                                    <a asp-action="Details" asp-route-id="@evt.Id"
+                                       class="btn btn-sm btn-warning stretched-link">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .info-card {
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+        .info-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .avatar {
+        font-size: 1.5rem;
+    }
+
+    .similar-event-card {
+        transition: transform 0.3s ease;
+    }
+
+        .similar-event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+    .recommendation-mini-card {
+        transition: transform 0.3s ease;
+        border-left: 3px solid #ffc107;
+    }
+
+        .recommendation-mini-card:hover {
+            transform: translateX(3px);
+        }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .badge {
+        border-radius: 20px;
+    }
+</style>
